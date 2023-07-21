@@ -99,7 +99,7 @@ class AiAssistant(object):
                 print("Error: %s" %e)
                 print("Code: %s \n \n" % code)
                 messages.append(
-                    {"role": 'user', "content": f"{self.__delimiter}I got this error: {str(e)}. Provide new code Please answer with code only.{self.__delimiter}"}
+                    {"role": 'user', "content": f"{self.__delimiter}I executed your response with 'exec' and I got this error: {str(e)}. Please answer with code only.{self.__delimiter}"}
                 )
                 response = openai.ChatCompletion.create(
                 model=self.model,

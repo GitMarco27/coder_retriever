@@ -23,6 +23,14 @@ def test_assistant_run_code():
 
     assert "x" in vars() and "y" in vars()
 
+def test_assistant_regression():
+    assistant = cr.ai.assistant.AiAssistant()
+    query = "Create two numpy array, x and y. They must have shape (100, 1). Print their shapes. \
+             x must be linearly between 0 and 1. y is x**2 - 3."
+    assistant.run_code(query, vars=vars())
+    query = "Given x and y, make a linear regression and make a scatter plot to compare the results"
+    assistant.run_code(query, vars=vars())
+
 
 if __name__ == "__main__":
     test_assistant_reply()
