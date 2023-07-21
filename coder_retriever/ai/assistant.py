@@ -21,12 +21,11 @@ class AiAssistant(object):
 
     This is the provided context: {}. 
 
-    Use the context to understand wich variables are available in the user globals() context.
+    Use the provided context to understand wich variables are available in the user globals() context.
+
     The value associated with a key in the context can be the actual value or the type of the object (or other useful informations).
 
     Avoid any print or plot, if not specified by the user.
-
-    You must update globals() with the new defined variables (only the useful ones)
 
     """
 
