@@ -21,7 +21,7 @@ class AiAssistant(object):
 
     This is the provided context: {}. 
 
-    Use the provided context to understand wich variables are available in the user globals() context.
+    Use the provided context to understand wich variables are available, but you cannot access context in you code.
 
     The value associated with a key in the context can be the actual value or the type of the object (or other useful informations).
 
@@ -64,7 +64,7 @@ class AiAssistant(object):
         
         return response.choices[0].message.content
 
-    def run_code(self, prompt: str, context: dict = {}, vars = None):
+    def run_code(self, prompt: str, context: dict = {}, vars: dict = {}):
         response = openai.ChatCompletion.create(
         model=self.model,
         messages=[
@@ -76,16 +76,7 @@ class AiAssistant(object):
         
         code = response.choices[0].message.content
 
-        local_context = {}
 
-        try:
-            exec(code, globals(), local_context)
-
-            if vars is not None:
-                vars.update(local_context)
-
-        except Exception as e:
-            print("Error: ", e)
-            print(code)
+        exec(code, globals(), vars)
 
         return code 
