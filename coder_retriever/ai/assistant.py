@@ -10,20 +10,26 @@ class AiAssistant(object):
 
     """
 
+    __delimiter = "####"
+
     __coder_system_message = """
 
-    You're task is to provide python code based on the prompt you receive from the user.
-    This code will be exececuted with the exec command by the user.
+    You're a python developer and your task is to provide python code based on the prompt you receive from the user.
 
-    Provide only code as string.
+    The user query will be delimited with {} characters.
 
+    Provide only code ready to be execuded. This code will be exececuted with the exec command by the user.
+    Avoid any no-code content in your response.
+
+    Do not return just a long python string as response.
+ 
     First develop the code. After that check the import of all the necessary libraries.
 
-    This is the provided context: {}. 
+    This is a dictionary of all the available variables (vars()) with their own dtype: context={}. 
+    If a variable is available in the context, do not instantiate it from scratch.
 
-    Use the provided context to understand wich variables are available, but you cannot access context in you code.
-
-    The value associated with a key in the context can be the actual value or the type of the object (or other useful informations).
+    Use the provided context to understand wich variables are available.
+    You cannot access context in you code.
 
     Avoid any print or plot, if not specified by the user.
 
@@ -64,19 +70,48 @@ class AiAssistant(object):
         
         return response.choices[0].message.content
 
-    def run_code(self, prompt: str, context: dict = {}, vars: dict = {}):
+    def run_code(self, prompt: str, vars: dict = {}):
+
+        messages = [
+                {"role": "system", "content": self.__coder_system_message.format({key: type(vars[key]) for key in vars},
+                                                                                 self.__delimiter)},
+                {"role": "user", "content": f"{self.__delimiter}{prompt}{self.__delimiter}"},
+            ]
+
         response = openai.ChatCompletion.create(
         model=self.model,
-        messages=[
-                {"role": "system", "content": self.__coder_system_message.format(context)},
-                {"role": "user", "content": prompt},
-            ],
+        messages=messages,
             temperature=self.temperature
             )
         
         code = response.choices[0].message.content
 
+        messages.append(
+            {"role": 'assistant', "content": code}
+        )
 
-        exec(code, globals(), vars)
+        for _ in range(5):
+            try:
+                exec(code, globals(), vars)
+                return code 
+            except Exception as e:
+                print("------ Error in code execution ------")
+                print("Error: %s" %e)
+                print("Code: %s \n \n" % code)
+                messages.append(
+                    {"role": 'user', "content": f"{self.__delimiter}I got this error: {str(e)}. Provide new code Please answer with code only.{self.__delimiter}"}
+                )
+                response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=messages,
+                    temperature=self.temperature
+                    )
+                
+                code = response.choices[0].message.content
 
-        return code 
+                messages.append(
+                    {"role": 'assistant', "content": code}
+                )
+
+        raise ValueError('AI assistant failed')
+        
