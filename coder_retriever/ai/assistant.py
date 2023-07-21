@@ -36,7 +36,9 @@ class AiAssistant(object):
             if load_dotenv():
                 openai.api_key = os.getenv("openai_api_key")
             else:
-                openai.api_key = openai_api_key
+                raise ValueError("Missing OpenAI API key")
+        else:
+            openai.api_key = openai_api_key
         
         if system_message is None:
             self.system_message = self.__default_system_message
