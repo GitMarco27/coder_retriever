@@ -1,9 +1,16 @@
+"""
+Ai Assistant module
+"""
+
 import os
 from dotenv import load_dotenv
 import openai
 
 
 class AiAssistant(object):
+    """
+    AiAssistant based on the OpenAI ChatCompletion API.
+    """
     __default_system_message = """
 
     You are an AI assistant.
@@ -62,7 +69,13 @@ class AiAssistant(object):
 
         self.temperature = temperature
 
-    def reply(self, prompt: str):
+    def reply(self, prompt: str) -> str:
+        """
+        :param prompt: ai assistant query
+        :return: ai assistant reply
+
+        Get an AI assistant reply from a user prompt
+        """
         response = openai.ChatCompletion.create(
             model=self.model,
             messages=[
@@ -74,16 +87,24 @@ class AiAssistant(object):
 
         return response.choices[0].message.content
 
-    def run_code(self, prompt: str, vars: dict = None, iterations: int = 5):
+    def run_code(self, prompt: str, vars_: dict = None, iterations: int = 5) -> str:
+        """
+        :param prompt: ai assistant query
+        :param vars: context variables
+        :param iterations: maximum code execution iterations
+        :return: ai assistant-generated code
 
-        if vars is None:
-            vars = dict()
+        Get an AI assistant reply from a user prompt
+        """
+
+        if vars_ is None:
+            vars_ = {}
 
         messages = [
             {
                 "role": "system",
                 "content": self.__coder_system_message.format(
-                    {key: type(vars[key]) for key in vars}, self.__delimiter
+                    {key: type(vars_[key]) for key in vars_}, self.__delimiter
                 ),
             },
             {
@@ -102,17 +123,18 @@ class AiAssistant(object):
 
         for _ in range(iterations):
             try:
-                exec(code, globals(), vars)
+                exec(code, globals(), vars_)
                 return code
-            except Exception as error:
+            except RuntimeError as error:
                 print("------ Error in code execution ------")
-                print("Error: %s" % error)
-                print("Code: %s \n \n" % code)
+                print(f"Error: {error}")
+                print(f"Code: {code} \n \n")
                 messages.append(
                     {
                         "role": "user",
-                        "content": f"{self.__delimiter}I executed your response with 'exec' and I got this error: {str(error)}. \
-                         Please answer with code only.{self.__delimiter}",
+                        "content": f"{self.__delimiter}I executed your response with 'exec' and \
+                        I got this error: {str(error)}. \
+                        Please answer with code only.{self.__delimiter}",
                     }
                 )
                 response = openai.ChatCompletion.create(
