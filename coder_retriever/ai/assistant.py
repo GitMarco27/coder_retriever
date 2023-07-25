@@ -100,7 +100,7 @@ class AiAssistant:
         :param prompt: ai assistant query
         :param vars: context variables
         :param iterations: maximum code execution iterations
-        :return: ai assistant-generated code
+        :return: messages history
 
         Get an AI assistant reply from a user prompt
         """
@@ -124,7 +124,7 @@ class AiAssistant:
         response = openai.ChatCompletion.create(
             model=self.model, messages=messages, temperature=self.temperature
         )
-        print(response.choices[0].message.content)
+
         code = json.loads(response.choices[0].message.content)[0]["code"]
 
         messages.append({"role": "assistant", "content": code})
@@ -135,7 +135,9 @@ class AiAssistant:
                 exec(code, globals(), vars_)
                 # pylint: enable=exec-used
                 break
-            except RuntimeError as error:
+            # pylint: disable=broad-exception-caught
+            except Exception as error:
+            # pylint: enable=broad-exception-caught
                 print("------ Error in code execution ------")
                 print(f"Error: {error}")
                 print(f"Code: {code} \n \n")
@@ -160,4 +162,4 @@ class AiAssistant:
 
                 messages.append({"role": "assistant", "content": code})
 
-        return code
+        return messages
