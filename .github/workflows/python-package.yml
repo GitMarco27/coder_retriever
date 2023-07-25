@@ -39,6 +39,5 @@ jobs:
       env:
         openai_api_key: ${{ secrets.openai_api_key }}
       run: |
-        pwd
-        ls
+        export openai_api_key=$openai_api_key
         python -m pytest
