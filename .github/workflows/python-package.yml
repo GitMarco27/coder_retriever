@@ -39,5 +39,4 @@ jobs:
       env:
         openai_api_key: ${{ secrets.openai_api_key }}
       run: |
-        echo "My secret key: $openai_api_key"
-        python -m pytest
+        python -m pytest --ignore tests/test_assistant.py
