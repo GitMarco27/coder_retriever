@@ -40,4 +40,4 @@ def test_assistant_regression():
 
 
 if __name__ == "__main__":
-    test_assistant_reply()
+    test_assistant_run_code()

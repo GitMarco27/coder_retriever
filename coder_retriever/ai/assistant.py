@@ -1,10 +1,11 @@
 """
 Ai Assistant module
 """
-
+import json
 import os
 from dotenv import load_dotenv
 import openai
+
 
 
 class AiAssistant:
@@ -28,11 +29,16 @@ class AiAssistant:
     Provide only code ready to be execuded. This code will be exececuted with the exec command by the user.
     Avoid any no-code content in your response.
 
-    Do not return just a long python string as response.
+    << FORMATTING >>
+    Your response should be in JSON format. Here is the expected JSON format:
+    [
+     {{"code": "YOUR PYTHON CODE GOES HERE",
+     "message": "any other comment you want to add to the response"}},
+]
  
-    First develop the code. After that check the import of all the necessary libraries.
+    While developing the code check the import of all the necessary libraries.
 
-    This is a dictionary of all the available variables (vars()) with their own dtype: context={}. 
+    This is a dictionary of all the available variables (vars()) with their own dtype: context= {} . 
     If a variable is available in the context, do not instantiate it from scratch.
 
     Use the provided context to understand wich variables are available.
@@ -106,7 +112,7 @@ class AiAssistant:
             {
                 "role": "system",
                 "content": self.__coder_system_message.format(
-                    {key: type(vars_[key]) for key in vars_}, self.__delimiter
+                    self.__delimiter, {key: type(vars_[key]) for key in vars_}
                 ),
             },
             {
@@ -118,8 +124,8 @@ class AiAssistant:
         response = openai.ChatCompletion.create(
             model=self.model, messages=messages, temperature=self.temperature
         )
-
-        code = response.choices[0].message.content
+        print(response.choices[0].message.content)
+        code = json.loads(response.choices[0].message.content)[0]["code"]
 
         messages.append({"role": "assistant", "content": code})
 
@@ -150,7 +156,7 @@ class AiAssistant:
                     model=self.model, messages=messages, temperature=self.temperature
                 )
 
-                code = response.choices[0].message.content
+                code = json.loads(response.choices[0].message.content)[0]["code"]
 
                 messages.append({"role": "assistant", "content": code})
 
