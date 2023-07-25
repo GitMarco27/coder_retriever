@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import openai
 
 
-class AiAssistant(object):
+class AiAssistant:
     """
     AiAssistant based on the OpenAI ChatCompletion API.
     """
