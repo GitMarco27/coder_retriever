@@ -121,14 +121,21 @@ class AiAssistant:
 
         messages.append({"role": "assistant", "content": code})
 
-        for _ in range(iterations):
+        for i in range(iterations):
             try:
+                # pylint: disable=exec-used
                 exec(code, globals(), vars_)
+                # pylint: enable=exec-used
                 return code
             except RuntimeError as error:
                 print("------ Error in code execution ------")
                 print(f"Error: {error}")
                 print(f"Code: {code} \n \n")
+
+                if i - 1 == iterations:
+                    print("Maximum number of iterations reached")
+                    return code
+
                 messages.append(
                     {
                         "role": "user",
