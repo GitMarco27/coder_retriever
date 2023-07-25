@@ -1,5 +1,7 @@
 # Coder Retriever 🦮
 
+[![Pylint](https://github.com/GitMarco27/coder_retriever/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/GitMarco27/coder_retriever/actions/workflows/pylint.yml)
+
 CodeRetriever: Your loyal coding companion. Just like a Golden Retriever, we're here to fetch and provide you with the most essential pieces of code. 
 
 ## Installation
