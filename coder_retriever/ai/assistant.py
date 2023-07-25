@@ -52,6 +52,8 @@ class AiAssistant:
         if openai_api_key is None:
             if load_dotenv():
                 openai.api_key = os.getenv("openai_api_key")
+            elif "openai_api_key" in os.environ:
+                openai.api_key = os.environ['openai_api_key']
             else:
                 raise ValueError("Missing OpenAI API key")
         else:
