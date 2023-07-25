@@ -35,8 +35,13 @@ class AiAssistant(object):
 
     """
 
-    def __init__(self, system_message: str = None, openai_api_key: str = None,
-                 model: str = None, temperature: float = 0.) -> None:
+    def __init__(
+        self,
+        system_message: str = None,
+        openai_api_key: str = None,
+        model: str = None,
+        temperature: float = 0.0,
+    ) -> None:
         if openai_api_key is None:
             if load_dotenv():
                 openai.api_key = os.getenv("openai_api_key")
@@ -44,7 +49,7 @@ class AiAssistant(object):
                 raise ValueError("Missing OpenAI API key")
         else:
             openai.api_key = openai_api_key
-        
+
         if system_message is None:
             self.system_message = self.__default_system_message
         else:
@@ -57,61 +62,63 @@ class AiAssistant(object):
 
         self.temperature = temperature
 
-    
     def reply(self, prompt: str):
         response = openai.ChatCompletion.create(
-        model=self.model,
-        messages=[
+            model=self.model,
+            messages=[
                 {"role": "system", "content": self.system_message},
                 {"role": "user", "content": prompt},
             ],
-            temperature=self.temperature
-            )
-        
-        return response.choices[0].message.content
-
-    def run_code(self, prompt: str, vars: dict = {}):
-
-        messages = [
-                {"role": "system", "content": self.__coder_system_message.format({key: type(vars[key]) for key in vars},
-                                                                                 self.__delimiter)},
-                {"role": "user", "content": f"{self.__delimiter}{prompt}{self.__delimiter}"},
-            ]
-
-        response = openai.ChatCompletion.create(
-        model=self.model,
-        messages=messages,
-            temperature=self.temperature
-            )
-        
-        code = response.choices[0].message.content
-
-        messages.append(
-            {"role": 'assistant', "content": code}
+            temperature=self.temperature,
         )
 
-        for _ in range(5):
+        return response.choices[0].message.content
+
+    def run_code(self, prompt: str, vars: dict = None, iterations: int = 5):
+
+        if vars is None:
+            vars = dict()
+
+        messages = [
+            {
+                "role": "system",
+                "content": self.__coder_system_message.format(
+                    {key: type(vars[key]) for key in vars}, self.__delimiter
+                ),
+            },
+            {
+                "role": "user",
+                "content": f"{self.__delimiter}{prompt}{self.__delimiter}",
+            },
+        ]
+
+        response = openai.ChatCompletion.create(
+            model=self.model, messages=messages, temperature=self.temperature
+        )
+
+        code = response.choices[0].message.content
+
+        messages.append({"role": "assistant", "content": code})
+
+        for _ in range(iterations):
             try:
                 exec(code, globals(), vars)
-                return code 
-            except Exception as e:
+                return code
+            except Exception as error:
                 print("------ Error in code execution ------")
-                print("Error: %s" %e)
+                print("Error: %s" % error)
                 print("Code: %s \n \n" % code)
                 messages.append(
-                    {"role": 'user', "content": f"{self.__delimiter}I executed your response with 'exec' and I got this error: {str(e)}. Please answer with code only.{self.__delimiter}"}
+                    {
+                        "role": "user",
+                        "content": f"{self.__delimiter}I executed your response with 'exec' and I got this error: {str(error)}. \
+                         Please answer with code only.{self.__delimiter}",
+                    }
                 )
                 response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=messages,
-                    temperature=self.temperature
-                    )
-                
-                code = response.choices[0].message.content
-
-                messages.append(
-                    {"role": 'assistant', "content": code}
+                    model=self.model, messages=messages, temperature=self.temperature
                 )
 
-        raise ValueError('AI assistant failed')
-        
+                code = response.choices[0].message.content
+
+                messages.append({"role": "assistant", "content": code})
