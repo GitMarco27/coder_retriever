@@ -126,6 +126,7 @@ class AiAssistant:
                 # pylint: disable=exec-used
                 exec(code, globals(), vars_)
                 # pylint: enable=exec-used
+                break
             except RuntimeError as error:
                 print("------ Error in code execution ------")
                 print(f"Error: {error}")

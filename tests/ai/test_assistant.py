@@ -1,11 +1,7 @@
 """
 Assistant tests
 """
-import sys
-import os
 import coder_retriever as cr
-
-sys.path.append(os.getcwd())
 
 
 def test_assistant_reply():
