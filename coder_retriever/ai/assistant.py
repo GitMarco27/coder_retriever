@@ -87,7 +87,7 @@ class AiAssistant:
 
         return response.choices[0].message.content
 
-    def run_code(self, prompt: str, vars_: dict = None, iterations: int = 5) -> str:
+    def run_code(self, prompt: str, vars_: dict = None, iterations: int = 5):
         """
         :param prompt: ai assistant query
         :param vars: context variables
@@ -126,7 +126,6 @@ class AiAssistant:
                 # pylint: disable=exec-used
                 exec(code, globals(), vars_)
                 # pylint: enable=exec-used
-                return code
             except RuntimeError as error:
                 print("------ Error in code execution ------")
                 print(f"Error: {error}")
@@ -134,7 +133,7 @@ class AiAssistant:
 
                 if i - 1 == iterations:
                     print("Maximum number of iterations reached")
-                    return code
+                    break
 
                 messages.append(
                     {
@@ -151,3 +150,5 @@ class AiAssistant:
                 code = response.choices[0].message.content
 
                 messages.append({"role": "assistant", "content": code})
+
+        return code
