@@ -1,8 +1,7 @@
 # Coder Retriever 🦮
 
-[![Pylint](https://github.com/GitMarco27/coder_retriever/actions/workflows/pylint.yml/badge.svg?branch=main)](https://github.com/GitMarco27/coder_retriever/actions/workflows/pylint.yml)
+[![code-check](https://github.com/GitMarco27/coder_retriever/actions/workflows/code-check.yml/badge.svg)](https://github.com/GitMarco27/coder_retriever/actions/workflows/code-check.yml)
 ![example workflow](https://img.shields.io/github/license/GitMarco27/GitMarco)
-[![Testing](https://github.com/GitMarco27/coder_retriever/actions/workflows/python-package.yml/badge.svg)](https://github.com/GitMarco27/coder_retriever/actions/workflows/python-package.yml)
 
 CodeRetriever: Your loyal coding companion. Just like a Golden Retriever, we're here to fetch and provide you with the most essential pieces of code.
 
