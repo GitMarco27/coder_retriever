@@ -16,6 +16,7 @@ def test_assistant_reply():
 
     print(assistant.reply(query))
 
+
 def test_assistant_run_code():
     """
     Testing the ability to run code of the ai assistant based on a simple query
@@ -26,6 +27,7 @@ def test_assistant_run_code():
     assistant.run_code(query, vars_=vars())
 
     assert "x" in vars() and "y" in vars()
+
 
 def test_assistant_regression():
     """

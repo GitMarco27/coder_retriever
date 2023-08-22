@@ -3,15 +3,17 @@ Ai Assistant module
 """
 import json
 import os
-from dotenv import load_dotenv
-import openai
+from typing import Optional
 
+import openai
+from dotenv import load_dotenv
 
 
 class AiAssistant:
     """
     AiAssistant based on the OpenAI ChatCompletion API.
     """
+
     __default_system_message = """
 
     You are an AI assistant.
@@ -35,10 +37,10 @@ class AiAssistant:
      {{"code": "YOUR PYTHON CODE GOES HERE",
      "message": "any other comment you want to add to the response"}},
 ]
- 
+
     While developing the code check the import of all the necessary libraries.
 
-    This is a dictionary of all the available variables (vars()) with their own dtype: context= {} . 
+    This is a dictionary of all the available variables (vars()) with their own dtype: context= {} .
     If a variable is available in the context, do not instantiate it from scratch.
 
     Use the provided context to understand wich variables are available.
@@ -50,16 +52,16 @@ class AiAssistant:
 
     def __init__(
         self,
-        system_message: str = None,
-        openai_api_key: str = None,
-        model: str = None,
+        system_message: Optional[str] = None,
+        openai_api_key: Optional[str] = None,
+        model: Optional[str] = None,
         temperature: float = 0.0,
     ) -> None:
         if openai_api_key is None:
             if load_dotenv():
                 openai.api_key = os.getenv("openai_api_key")
             elif "openai_api_key" in os.environ:
-                openai.api_key = os.environ['openai_api_key']
+                openai.api_key = os.environ["openai_api_key"]
             else:
                 raise ValueError("Missing OpenAI API key")
         else:
@@ -95,7 +97,7 @@ class AiAssistant:
 
         return response.choices[0].message.content
 
-    def run_code(self, prompt: str, vars_: dict = None, iterations: int = 5):
+    def run_code(self, prompt: str, vars_: Optional[dict] = None, iterations: int = 5):
         """
         :param prompt: ai assistant query
         :param vars: context variables
@@ -137,7 +139,7 @@ class AiAssistant:
                 break
             # pylint: disable=broad-exception-caught
             except Exception as error:
-            # pylint: enable=broad-exception-caught
+                # pylint: enable=broad-exception-caught
                 print("------ Error in code execution ------")
                 print(f"Error: {error}")
                 print(f"Code: {code} \n \n")
