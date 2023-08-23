@@ -38,10 +38,14 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install pytest
-      run: pip install pytest
+    - name: Run image
+      uses: abatilo/actions-poetry@v2
+      with:
+        poetry-version: "1.6.0"
+    - name: Install deps
+      run: poetry install
     - name: Test with pytest
       env:
         openai_api_key: ${{ secrets.openai_api_key }}
       run: |
-        python -m pytest --ignore tests/ai/test_assistant.py
+        poetry run pytest --ignore tests/ai/test_assistant.py
