@@ -48,4 +48,4 @@ jobs:
       env:
         openai_api_key: ${{ secrets.openai_api_key }}
       run: |
-        poetry run pytest --ignore tests/ai/test_assistant.py
+        poetry run pytest
